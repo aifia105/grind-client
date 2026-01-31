@@ -1,12 +1,15 @@
-import { workoutsSessions } from './workoutsSessions';
+import type { WorkoutSession } from "./workoutSession";
 
 export type Program = {
-  id?: string;
-  start: Date;
+  id: number;
+  startDate: string; // ISO 8601 date string
   description: string;
+  duration: number; // days
   split: Split;
-  duration: string;
-  workoutsSessions?: workoutsSessions[];
+  workoutSessions?: WorkoutSession[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
 };
 
 export enum Split {
@@ -17,3 +20,14 @@ export enum Split {
   LowerBody = 'Lower Body',
   BroSplit = 'Bro Split',
 }
+
+// DTO for creating programs
+export type CreateProgramRequest = {
+  startDate: string; // ISO 8601 date string
+  description: string;
+  duration: number;
+  split: Split;
+};
+
+// DTO for updating programs
+export type UpdateProgramRequest = Partial<CreateProgramRequest>;

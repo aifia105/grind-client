@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
 
 const API = axios.create({
   baseURL: 'http://localhost:8080/api/v1',
@@ -8,9 +9,37 @@ const API = axios.create({
   },
 });
 
-API.interceptors.request.use((config) => {
-  /* add token*/
-  return config;
-});
+// Request interceptor
+API.interceptors.request.use(
+  (config) => {
+    // TODO: Add authentication token when auth is implemented
+    // const token = getAuthToken();
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for error handling
+API.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ApiError>) => {
+    // Handle API errors
+    if (error.response?.data?.error) {
+      const apiError = error.response.data.error;
+      console.error(`API Error [${apiError.code}]:`, apiError.message);
+      if (apiError.details) {
+        console.error('Details:', apiError.details);
+      }
+    } else {
+      console.error('Network or unknown error:', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;
