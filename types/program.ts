@@ -1,16 +1,38 @@
-import type { WorkoutSession } from "./workoutSession";
+import type { WorkoutSession } from './workoutSession';
 
 export type Program = {
   id: number;
-  startDate: string; // ISO 8601 date string
+  name: string;
   description: string;
-  duration: number; // days
+  goal: ProgramGoal;
+  difficulty: ProgramDifficulty;
+  startDate: string; // ISO 8601 date string
+  duration: number; // weeks
   split: Split;
+  isActive: boolean;
   workoutSessions?: WorkoutSession[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
 };
+
+export enum ProgramGoal {
+  Strength = 'Strength',
+  Hypertrophy = 'Hypertrophy',
+  Endurance = 'Endurance',
+  WeightLoss = 'Weight Loss',
+  GeneralFitness = 'General Fitness',
+  Powerlifting = 'Powerlifting',
+  Bodybuilding = 'Bodybuilding',
+  AthleticPerformance = 'Athletic Performance',
+}
+
+export enum ProgramDifficulty {
+  Beginner = 'Beginner',
+  Intermediate = 'Intermediate',
+  Advanced = 'Advanced',
+  Expert = 'Expert',
+}
 
 export enum Split {
   FullBody = 'Full Body',
@@ -23,9 +45,12 @@ export enum Split {
 
 // DTO for creating programs
 export type CreateProgramRequest = {
-  startDate: string; // ISO 8601 date string
+  name: string;
   description: string;
-  duration: number;
+  goal: ProgramGoal;
+  difficulty: ProgramDifficulty;
+  startDate: string; // ISO 8601 date string
+  duration: number; // weeks
   split: Split;
 };
 

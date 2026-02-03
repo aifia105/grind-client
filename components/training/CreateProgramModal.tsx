@@ -1,7 +1,12 @@
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
 import { getFontFamily } from '@/constants/Fonts';
-import { Program, Split } from '@/types/program';
+import {
+  CreateProgramRequest,
+  Split,
+  ProgramGoal,
+  ProgramDifficulty,
+} from '@/types/program';
 import React, { useState } from 'react';
 import {
   Modal,
@@ -16,7 +21,7 @@ import {
 interface CreateProgramModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (programData: Program) => void;
+  onSubmit: (programData: CreateProgramRequest) => void;
   loading?: boolean;
 }
 
@@ -26,9 +31,33 @@ export default function CreateProgramModal({
   onSubmit,
   loading = false,
 }: CreateProgramModalProps) {
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedGoal, setSelectedGoal] = useState<ProgramGoal>(
+    ProgramGoal.Hypertrophy,
+  );
+  const [selectedDifficulty, setSelectedDifficulty] =
+    useState<ProgramDifficulty>(ProgramDifficulty.Intermediate);
   const [selectedSplit, setSelectedSplit] = useState<Split>(Split.FullBody);
   const [duration, setDuration] = useState('');
+
+  const goalOptions = [
+    { label: 'Strength', value: ProgramGoal.Strength },
+    { label: 'Hypertrophy', value: ProgramGoal.Hypertrophy },
+    { label: 'Endurance', value: ProgramGoal.Endurance },
+    { label: 'Weight Loss', value: ProgramGoal.WeightLoss },
+    { label: 'General Fitness', value: ProgramGoal.GeneralFitness },
+    { label: 'Powerlifting', value: ProgramGoal.Powerlifting },
+    { label: 'Bodybuilding', value: ProgramGoal.Bodybuilding },
+    { label: 'Athletic Performance', value: ProgramGoal.AthleticPerformance },
+  ];
+
+  const difficultyOptions = [
+    { label: 'Beginner', value: ProgramDifficulty.Beginner },
+    { label: 'Intermediate', value: ProgramDifficulty.Intermediate },
+    { label: 'Advanced', value: ProgramDifficulty.Advanced },
+    { label: 'Expert', value: ProgramDifficulty.Expert },
+  ];
 
   const splitOptions = [
     { label: 'Full Body', value: Split.FullBody },
@@ -40,28 +69,38 @@ export default function CreateProgramModal({
   ];
 
   const handleSubmit = () => {
-    if (!description.trim() || !duration.trim()) {
+    if (!name.trim() || !description.trim() || !duration.trim()) {
       return;
     }
 
-    const programData = {
-      start: new Date(),
+    const programData: CreateProgramRequest = {
+      name: name.trim(),
       description: description.trim(),
+      goal: selectedGoal,
+      difficulty: selectedDifficulty,
       split: selectedSplit,
-      duration: duration.trim(),
+      duration: parseInt(duration),
+      startDate: new Date().toISOString(),
     };
 
     onSubmit(programData);
   };
 
   const handleClose = () => {
+    setName('');
     setDescription('');
     setDuration('');
+    setSelectedGoal(ProgramGoal.Hypertrophy);
+    setSelectedDifficulty(ProgramDifficulty.Intermediate);
     setSelectedSplit(Split.FullBody);
     onClose();
   };
 
-  const isFormValid = description.trim() && duration.trim();
+  const isFormValid =
+    name.trim() &&
+    description.trim() &&
+    duration.trim() &&
+    parseInt(duration) > 0;
 
   return (
     <Modal
@@ -88,9 +127,20 @@ export default function CreateProgramModal({
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.field}>
-              <Text style={styles.label}>Description</Text>
+              <Text style={styles.label}>Program Name</Text>
               <TextInput
                 style={styles.textInput}
+                value={name}
+                onChangeText={setName}
+                placeholder="e.g., 8-Week Strength Builder"
+                placeholderTextColor={Colors.text.tertiary}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Description</Text>
+              <TextInput
+                style={[styles.textInput, styles.textArea]}
                 value={description}
                 onChangeText={setDescription}
                 placeholder="Enter program description"
@@ -101,23 +151,22 @@ export default function CreateProgramModal({
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Split Type</Text>
-              <View style={styles.splitContainer}>
-                {splitOptions.map((option) => (
+              <Text style={styles.label}>Goal</Text>
+              <View style={styles.optionContainer}>
+                {goalOptions.map((option) => (
                   <TouchableOpacity
                     key={option.value}
                     style={[
-                      styles.splitOption,
-                      selectedSplit === option.value &&
-                        styles.splitOptionSelected,
+                      styles.option,
+                      selectedGoal === option.value && styles.optionSelected,
                     ]}
-                    onPress={() => setSelectedSplit(option.value)}
+                    onPress={() => setSelectedGoal(option.value)}
                   >
                     <Text
                       style={[
-                        styles.splitOptionText,
-                        selectedSplit === option.value &&
-                          styles.splitOptionTextSelected,
+                        styles.optionText,
+                        selectedGoal === option.value &&
+                          styles.optionTextSelected,
                       ]}
                     >
                       {option.label}
@@ -128,13 +177,67 @@ export default function CreateProgramModal({
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Duration in weeks</Text>
+              <Text style={styles.label}>Difficulty</Text>
+              <View style={styles.optionContainer}>
+                {difficultyOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[
+                      styles.option,
+                      selectedDifficulty === option.value &&
+                        styles.optionSelected,
+                    ]}
+                    onPress={() => setSelectedDifficulty(option.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        selectedDifficulty === option.value &&
+                          styles.optionTextSelected,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Split Type</Text>
+              <View style={styles.optionContainer}>
+                {splitOptions.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[
+                      styles.option,
+                      selectedSplit === option.value && styles.optionSelected,
+                    ]}
+                    onPress={() => setSelectedSplit(option.value)}
+                  >
+                    <Text
+                      style={[
+                        styles.optionText,
+                        selectedSplit === option.value &&
+                          styles.optionTextSelected,
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Duration (weeks)</Text>
               <TextInput
                 style={styles.textInput}
                 value={duration}
                 onChangeText={setDuration}
-                placeholder="e.g., 8 weeks"
+                placeholder="e.g., 8"
                 placeholderTextColor={Colors.text.tertiary}
+                keyboardType="numeric"
               />
             </View>
           </ScrollView>
@@ -227,14 +330,17 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     borderWidth: 1,
     borderColor: Colors.border.primary,
-    textAlignVertical: 'top',
   },
-  splitContainer: {
+  textArea: {
+    textAlignVertical: 'top',
+    minHeight: 80,
+  },
+  optionContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
-  splitOption: {
+  option: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -242,16 +348,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border.primary,
   },
-  splitOptionSelected: {
+  optionSelected: {
     backgroundColor: Colors.accent.primary,
     borderColor: Colors.accent.primary,
   },
-  splitOptionText: {
+  optionText: {
     fontSize: 14,
     fontFamily: getFontFamily('notoSans', 'medium'),
     color: Colors.text.secondary,
   },
-  splitOptionTextSelected: {
+  optionTextSelected: {
     color: Colors.background.primary,
   },
   footer: {
