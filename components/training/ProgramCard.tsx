@@ -18,10 +18,14 @@ interface ProgramCardProps {
 export default function ProgramCard({ program }: ProgramCardProps) {
   const getDifficultyColor = (split: string) => {
     switch (split) {
-      case 'Full Body': return '#8b5cf6';
-      case 'Upper Body': return '#f59e0b';
-      case 'Lower Body': return '#ef4444';
-      default: return '#4ade80';
+      case 'Full Body':
+        return '#8b5cf6';
+      case 'Upper Body':
+        return '#f59e0b';
+      case 'Lower Body':
+        return '#ef4444';
+      default:
+        return '#4ade80';
     }
   };
 
@@ -32,7 +36,12 @@ export default function ProgramCard({ program }: ProgramCardProps) {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.titleSection}>
-            <View style={[styles.splitBadge, { backgroundColor: getDifficultyColor(program.split) }]}>
+            <View
+              style={[
+                styles.splitBadge,
+                { backgroundColor: getDifficultyColor(program.split) },
+              ]}
+            >
               <Text style={styles.splitText}>{program.split}</Text>
             </View>
             <Text style={styles.title}>{program.Description}</Text>
@@ -41,7 +50,7 @@ export default function ProgramCard({ program }: ProgramCardProps) {
             <IconSymbol size={20} name="paperplane.fill" color="#111816" />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.footer}>
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
@@ -50,7 +59,9 @@ export default function ProgramCard({ program }: ProgramCardProps) {
             </View>
             <View style={styles.statItem}>
               <IconSymbol size={16} name="dumbbell.fill" color="#ffffff" />
-              <Text style={styles.statText}>{program.exercisesNumber} exercises</Text>
+              <Text style={styles.statText}>
+                {program.exercisesNumber} exercises
+              </Text>
             </View>
           </View>
         </View>
@@ -61,11 +72,12 @@ export default function ProgramCard({ program }: ProgramCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    height: 180,
-    borderRadius: 16,
+    height: 200,
+    borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
     position: 'relative',
+    ...Colors.shadow.medium,
   },
   backgroundImage: {
     position: 'absolute',
@@ -77,11 +89,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: 'space-between',
   },
   header: {
@@ -94,51 +106,53 @@ const styles = StyleSheet.create({
   },
   splitBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginBottom: 10,
   },
   splitText: {
-    fontSize: 12,
-    fontFamily: getFontFamily('notoSans', 'bold'),
+    fontSize: 11,
+    fontFamily: getFontFamily('notoSans', 'black'),
     color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   title: {
-    fontSize: 20,
-    fontFamily: getFontFamily('spaceGrotesk', 'bold'),
+    fontSize: 22,
+    fontFamily: getFontFamily('spaceGrotesk', 'black'),
     color: '#ffffff',
-    lineHeight: 24,
+    lineHeight: 26,
+    letterSpacing: -0.5,
   },
   playButton: {
     backgroundColor: Colors.accent.primary,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.accent.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    ...Colors.shadow.glow,
   },
   footer: {
     marginTop: 'auto',
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 16,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
   statText: {
-    fontSize: 14,
-    fontFamily: getFontFamily('notoSans', 'medium'),
+    fontSize: 13,
+    fontFamily: getFontFamily('notoSans', 'bold'),
     color: '#ffffff',
-    opacity: 0.9,
   },
 });

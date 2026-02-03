@@ -56,10 +56,10 @@ export default function StatsGrid() {
                 <View
                   style={[
                     styles.progressFill,
-                    { 
+                    {
                       width: `${stat.progress}%`,
-                      backgroundColor: stat.color
-                    }
+                      backgroundColor: stat.color,
+                    },
                   ]}
                 />
               </View>
@@ -77,10 +77,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: getFontFamily('spaceGrotesk', 'bold'),
     color: Colors.text.primary,
     marginBottom: 16,
+    letterSpacing: -0.5,
   },
   grid: {
     flexDirection: 'row',
@@ -89,57 +90,61 @@ const styles = StyleSheet.create({
   },
   statCard: {
     backgroundColor: Colors.surface.primary,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     borderWidth: 1,
     borderColor: Colors.border.primary,
     width: '48%',
-    minHeight: 120,
+    minHeight: 130,
     justifyContent: 'space-between',
+    ...Colors.shadow.small,
   },
   statHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   statIcon: {
-    fontSize: 16,
+    fontSize: 18,
     marginRight: 8,
   },
   statTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: getFontFamily('notoSans', 'medium'),
-    color: Colors.text.secondary,
+    color: Colors.text.tertiary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statValue: {
-    fontSize: 20,
-    fontFamily: getFontFamily('spaceGrotesk', 'bold'),
+    fontSize: 24,
+    fontFamily: getFontFamily('spaceGrotesk', 'black'),
     color: Colors.text.primary,
     marginBottom: 2,
+    letterSpacing: -0.5,
   },
   statTarget: {
     fontSize: 12,
-    fontFamily: getFontFamily('notoSans', 'regular'),
+    fontFamily: getFontFamily('notoSans', 'medium'),
     color: Colors.text.secondary,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   progressContainer: {
-    gap: 4,
+    gap: 6,
   },
   progressBar: {
-    height: 4,
+    height: 6,
     backgroundColor: Colors.surface.elevated,
-    borderRadius: 2,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 3,
   },
   progressText: {
     fontSize: 10,
-    fontFamily: getFontFamily('notoSans', 'bold'),
-    color: Colors.text.secondary,
+    fontFamily: getFontFamily('spaceGrotesk', 'bold'),
+    color: Colors.text.tertiary,
     textAlign: 'right',
   },
 });

@@ -11,7 +11,8 @@ export default function MacroCard() {
     fat: { current: 65, target: 80 },
   };
 
-  const getProgress = (current: number, target: number) => (current / target) * 100;
+  const getProgress = (current: number, target: number) =>
+    (current / target) * 100;
 
   const getProgressColor = (progress: number) => {
     if (progress >= 90) return Colors.accent.success;
@@ -24,54 +25,55 @@ export default function MacroCard() {
       <View style={styles.caloriesContainer}>
         <Text style={styles.title}>Nutrition</Text>
         <Text style={styles.subtitle}>Today's Progress</Text>
-        <Text style={styles.calorieNumber}>
-          {macros.calories.current}
-        </Text>
-        <Text style={styles.calorieLabel}>
-          / {macros.calories.target} kcal
-        </Text>
+        <Text style={styles.calorieNumber}>{macros.calories.current}</Text>
+        <Text style={styles.calorieLabel}>/ {macros.calories.target} kcal</Text>
         <View style={styles.calorieProgress}>
           <View style={styles.progressBar}>
             <View
               style={[
                 styles.progressFill,
-                { 
+                {
                   width: `${Math.min(getProgress(macros.calories.current, macros.calories.target), 100)}%`,
-                  backgroundColor: getProgressColor(getProgress(macros.calories.current, macros.calories.target))
-                }
+                  backgroundColor: getProgressColor(
+                    getProgress(
+                      macros.calories.current,
+                      macros.calories.target,
+                    ),
+                  ),
+                },
               ]}
             />
           </View>
         </View>
       </View>
-      
+
       <View style={styles.macrosList}>
-        {Object.entries(macros).slice(1).map(([macro, data]) => {
-          const progress = getProgress(data.current, data.target);
-          return (
-            <View key={macro} style={styles.macroRow}>
-              <Text style={styles.macroLabel}>
-                {macro.charAt(0).toUpperCase() + macro.slice(1)}
-              </Text>
-              <View style={styles.macroValueContainer}>
-                <Text style={styles.macroValue}>
-                  {data.current}g
+        {Object.entries(macros)
+          .slice(1)
+          .map(([macro, data]) => {
+            const progress = getProgress(data.current, data.target);
+            return (
+              <View key={macro} style={styles.macroRow}>
+                <Text style={styles.macroLabel}>
+                  {macro.charAt(0).toUpperCase() + macro.slice(1)}
                 </Text>
-                <View style={styles.miniProgressBar}>
-                  <View
-                    style={[
-                      styles.miniProgressFill,
-                      { 
-                        width: `${Math.min(progress, 100)}%`,
-                        backgroundColor: getProgressColor(progress)
-                      }
-                    ]}
-                  />
+                <View style={styles.macroValueContainer}>
+                  <Text style={styles.macroValue}>{data.current}g</Text>
+                  <View style={styles.miniProgressBar}>
+                    <View
+                      style={[
+                        styles.miniProgressFill,
+                        {
+                          width: `${Math.min(progress, 100)}%`,
+                          backgroundColor: getProgressColor(progress),
+                        },
+                      ]}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
-          );
-        })}
+            );
+          })}
       </View>
     </View>
   );
@@ -81,53 +83,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.surface.primary,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 20,
     borderWidth: 1,
     borderColor: Colors.border.primary,
+    ...Colors.shadow.medium,
   },
   title: {
     fontSize: 18,
     fontFamily: getFontFamily('spaceGrotesk', 'bold'),
     color: Colors.text.primary,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: getFontFamily('notoSans', 'regular'),
-    color: Colors.text.secondary,
-    marginBottom: 16,
+    color: Colors.text.tertiary,
+    marginBottom: 20,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   caloriesContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   calorieNumber: {
-    fontSize: 32,
-    fontFamily: getFontFamily('spaceGrotesk', 'bold'),
+    fontSize: 40,
+    fontFamily: getFontFamily('spaceGrotesk', 'black'),
     color: Colors.text.primary,
+    letterSpacing: -1,
   },
   calorieLabel: {
-    fontSize: 14,
-    fontFamily: getFontFamily('notoSans', 'regular'),
+    fontSize: 13,
+    fontFamily: getFontFamily('notoSans', 'medium'),
     color: Colors.text.secondary,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   calorieProgress: {
     width: '100%',
   },
   progressBar: {
-    height: 6,
+    height: 8,
     backgroundColor: Colors.surface.elevated,
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 4,
   },
   macrosList: {
-    gap: 12,
+    gap: 14,
   },
   macroRow: {
     flexDirection: 'row',
@@ -135,9 +141,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   macroLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: getFontFamily('notoSans', 'medium'),
-    color: Colors.text.primary,
+    color: Colors.text.secondary,
     flex: 1,
   },
   macroValueContainer: {
@@ -145,8 +151,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   macroValue: {
-    fontSize: 14,
-    fontFamily: getFontFamily('notoSans', 'bold'),
+    fontSize: 15,
+    fontFamily: getFontFamily('spaceGrotesk', 'bold'),
     color: Colors.text.primary,
     marginBottom: 4,
   },

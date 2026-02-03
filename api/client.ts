@@ -1,8 +1,8 @@
-import axios, { AxiosError } from 'axios';
 import { ApiError } from '@/types/api';
+import axios, { AxiosError } from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:8080/api/v1',
+  baseURL: process.env.BACKEND_URL || '',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ API.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor for error handling
@@ -39,7 +39,7 @@ API.interceptors.response.use(
       console.error('Network or unknown error:', error.message);
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default API;
