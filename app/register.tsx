@@ -1,9 +1,13 @@
+import { register } from '@/api/auth';
 import Button from '@/components/ui/Button';
 import { Colors } from '@/constants/Colors';
 import { getFontFamily } from '@/constants/Fonts';
+import { RegisterCredentials } from '@/types/auth';
+import { useMutation } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, router } from 'expo-router';
-import React, { useState } from 'react';
+import { Link } from 'expo-router';
+import React from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,25 +18,51 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 export default function RegisterScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<RegisterCredentials>({
+    defaultValues: {
+      name: '',
+      age: 0,
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      // TODO: Show error toast
-      return;
-    }
-    setLoading(true);
-    // TODO: Implement register API call
-    setTimeout(() => {
-      setLoading(false);
-      router.replace('/(tabs)');
-    }, 1500);
+  const password = watch('password');
+
+  const registerMutation = useMutation({
+    mutationFn: async (data: RegisterCredentials) => {
+      console.log(data);
+      return await register(data);
+    },
+    onSuccess: (data) => {
+      console.log('Registration successful:', data);
+      Toast.show({
+        type: 'success',
+        text1: 'Registration Successful',
+        text2: 'Welcome to Grind!',
+      });
+    },
+    onError: (error) => {
+      console.error('Registration failed:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: 'Please check your information and try again.',
+      });
+    },
+  });
+
+  const onSubmit = async (data: RegisterCredentials) => {
+    registerMutation.mutate(data);
   };
 
   return (
@@ -53,7 +83,7 @@ export default function RegisterScreen() {
             {/* Logo/Brand Section */}
             <View style={styles.header}>
               <LinearGradient
-                colors={Colors.accent.gradient.purple}
+                colors={Colors.accent.gradient.purple as [string, string]}
                 style={styles.logoContainer}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -71,68 +101,178 @@ export default function RegisterScreen() {
               {/* Name Input */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>FULL NAME</Text>
-                <View style={[styles.inputContainer, Colors.shadow.small]}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="John Doe"
-                    placeholderTextColor={Colors.text.tertiary}
-                    value={name}
-                    onChangeText={setName}
-                    autoCapitalize="words"
-                    autoCorrect={false}
-                  />
-                </View>
+                <Controller
+                  control={control}
+                  name="name"
+                  rules={{
+                    required: 'Name is required',
+                    minLength: {
+                      value: 2,
+                      message: 'Name must be at least 2 characters',
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={[styles.inputContainer, Colors.shadow.small]}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Cookie Monster"
+                        placeholderTextColor={Colors.text.tertiary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        autoCapitalize="words"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                />
+                {errors.name && (
+                  <Text style={styles.errorText}>{errors.name.message}</Text>
+                )}
+              </View>
+
+              {/* Age Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>AGE</Text>
+                <Controller
+                  control={control}
+                  name="age"
+                  rules={{
+                    required: 'Age is required',
+                    min: {
+                      value: 13,
+                      message: 'You must be at least 13 years old',
+                    },
+                    max: {
+                      value: 120,
+                      message: 'Please enter a valid age',
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={[styles.inputContainer, Colors.shadow.small]}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="25"
+                        placeholderTextColor={Colors.text.tertiary}
+                        value={value ? value.toString() : ''}
+                        onChangeText={(text) => {
+                          const numericValue = parseInt(text, 10);
+                          onChange(isNaN(numericValue) ? 0 : numericValue);
+                        }}
+                        onBlur={onBlur}
+                        keyboardType="number-pad"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                />
+                {errors.age && (
+                  <Text style={styles.errorText}>{errors.age.message}</Text>
+                )}
               </View>
 
               {/* Email Input */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>EMAIL</Text>
-                <View style={[styles.inputContainer, Colors.shadow.small]}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="your@email.com"
-                    placeholderTextColor={Colors.text.tertiary}
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Invalid email address',
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={[styles.inputContainer, Colors.shadow.small]}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="your@email.com"
+                        placeholderTextColor={Colors.text.tertiary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                />
+                {errors.email && (
+                  <Text style={styles.errorText}>{errors.email.message}</Text>
+                )}
               </View>
 
               {/* Password Input */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>PASSWORD</Text>
-                <View style={[styles.inputContainer, Colors.shadow.small]}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Create a strong password"
-                    placeholderTextColor={Colors.text.tertiary}
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{
+                    required: 'Password is required',
+                    minLength: {
+                      value: 8,
+                      message: 'Password must be at least 8 characters',
+                    },
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={[styles.inputContainer, Colors.shadow.small]}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Create a strong password"
+                        placeholderTextColor={Colors.text.tertiary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                />
+                {errors.password && (
+                  <Text style={styles.errorText}>
+                    {errors.password.message}
+                  </Text>
+                )}
               </View>
 
               {/* Confirm Password Input */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>CONFIRM PASSWORD</Text>
-                <View style={[styles.inputContainer, Colors.shadow.small]}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Confirm your password"
-                    placeholderTextColor={Colors.text.tertiary}
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
+                <Controller
+                  control={control}
+                  name="confirmPassword"
+                  rules={{
+                    required: 'Please confirm your password',
+                    validate: (value) =>
+                      value === password || 'Passwords do not match',
+                  }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <View style={[styles.inputContainer, Colors.shadow.small]}>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Confirm your password"
+                        placeholderTextColor={Colors.text.tertiary}
+                        value={value}
+                        onChangeText={onChange}
+                        onBlur={onBlur}
+                        secureTextEntry
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                      />
+                    </View>
+                  )}
+                />
+                {errors.confirmPassword && (
+                  <Text style={styles.errorText}>
+                    {errors.confirmPassword.message}
+                  </Text>
+                )}
               </View>
 
               {/* Terms & Conditions */}
@@ -145,10 +285,10 @@ export default function RegisterScreen() {
               {/* Register Button */}
               <Button
                 title="Create Account"
-                onPress={handleRegister}
+                onPress={handleSubmit(onSubmit)}
                 variant="primary"
                 size="large"
-                loading={loading}
+                loading={registerMutation.isPending}
                 fullWidth
               />
 
@@ -207,12 +347,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 48,
   },
   logoContainer: {
     width: 80,
@@ -283,7 +421,7 @@ const styles = StyleSheet.create({
   divider: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 28,
+    marginVertical: 32,
   },
   dividerLine: {
     flex: 1,
@@ -325,7 +463,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 28,
+    marginTop: 32,
   },
   footerText: {
     fontSize: 15,
@@ -336,5 +474,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: getFontFamily('notoSans', 'bold'),
     color: Colors.accent.primary,
+  },
+  errorText: {
+    fontSize: 12,
+    fontFamily: getFontFamily('notoSans', 'regular'),
+    color: Colors.accent.error,
+    marginTop: 4,
   },
 });

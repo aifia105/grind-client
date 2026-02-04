@@ -9,6 +9,7 @@ import { Link } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -85,7 +86,7 @@ export default function LoginScreen() {
               >
                 <Text style={styles.logoText}>G</Text>
               </LinearGradient>
-              <Text style={styles.title}>Welcome Back</Text>
+              <Text style={styles.title}>Grind</Text>
               <Text style={styles.subtitle}>
                 Sign in to continue your fitness journey
               </Text>
@@ -190,13 +191,21 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   style={[styles.socialButton, Colors.shadow.small]}
                 >
-                  <Text style={styles.socialButtonText}>🍎</Text>
-                  <Text style={styles.socialButtonLabel}>Apple</Text>
+                  <Text style={styles.socialButtonText}>
+                    <Image
+                      source={require('@/assets/images/whatsapp.png')}
+                      style={styles.socialButtonIcon}
+                    />
+                  </Text>
+                  <Text style={styles.socialButtonLabel}>Whatsapp</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.socialButton, Colors.shadow.small]}
                 >
-                  <Text style={styles.socialButtonText}>G</Text>
+                  <Image
+                    source={require('@/assets/images/google.png')}
+                    style={styles.socialButtonIcon}
+                  />
                   <Text style={styles.socialButtonLabel}>Google</Text>
                 </TouchableOpacity>
               </View>
@@ -336,6 +345,7 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 20,
+    color: Colors.text.primary,
   },
   socialButtonLabel: {
     fontSize: 15,
@@ -361,7 +371,11 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 12,
     fontFamily: getFontFamily('notoSans', 'regular'),
-    color: Colors.accent.danger,
+    color: Colors.accent.error,
     marginTop: 4,
+  },
+  socialButtonIcon: {
+    width: 20,
+    height: 20,
   },
 });
